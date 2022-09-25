@@ -14,8 +14,8 @@ Somente essa base de dados pode ficar fora do buffer principal, ou seja, pode us
 
 // tamanho da pessoa + pnext: sizeof(char)*10 + sizeof(int)*4
 
-void incluirPessoa(void **primeiro, void **ultimo, int *qtdLista);
-void listarPessoas();
+void incluirPessoa(char **primeiro, char **ultimo);
+void listarPessoas(char **inicio);
 void excluirPessoa();
 void buscarPessoa();
 void resetLista();
@@ -24,16 +24,17 @@ void realocarMemoria();
 // pBuffer = ['int = 1 ou 0 define se programa para ou continua', 'int = quantidade de pessoas adicionadas ' ]
 void *lista;
 int qtdLista2 = 0;
+char *primeiro = NULL;
+char *ultimo = NULL;
+
 int main()
 {
 
     void *pBuffer;
     int *opcao;
     lista = (int *)malloc(3 * sizeof(int));
-    void **primeiro, **ultimo;
-    int *qtdLista;
 
-    resetLista();
+    // resetLista();
 
     pBuffer = (int *)malloc(sizeof(int) * 2);
     opcao = pBuffer;
@@ -48,14 +49,14 @@ int main()
         switch (*((int *)pBuffer))
         {
         case 1:
-            incluirPessoa(primeiro, ultimo, qtdLista);
+            incluirPessoa(&primeiro, ultimo);
             break;
         case 2:
             excluirPessoa();
             break;
         case 3:
             // printf("Lista fora da função: %p\n", lista);
-            listarPessoas();
+            listarPessoas(&primeiro);
             break;
         case 4:
             buscarPessoa();
@@ -71,20 +72,18 @@ int main()
 
     // printf("Valor pBuffer = %d\n", *((int *)pBuffer));
 
+    finalizar();
     free(pBuffer);
     free(lista);
     return 0;
 }
 
-void incluirPessoa(void **primeiro, void **ultimo, int *qtdLista)
+void incluirPessoa(char **inicio, char **fim)
 {
     void *nodo = (void *)malloc(sizeof(int) * 4 + sizeof(char) * 11);
     char *nome = (char *)malloc(sizeof(char) * 11);
     int *idade, *telefone;
-    void **comparar, *anterior, *proximo;
-
-    primeiro = lista;
-    ultimo = (lista + sizeof(int));
+    char *anterior, *proximo;
 
     nome = nodo;
     idade = (nodo + sizeof(char) * 11);
@@ -98,28 +97,20 @@ void incluirPessoa(void **primeiro, void **ultimo, int *qtdLista)
     scanf("%d", idade);
     printf("Digite o telefone: ");
     scanf("%d", telefone);
-    printf("\n\nNome: %s\nIdade: %d\nTelefone: %d", nodo, *((int *)(nodo + sizeof(char) * 11)), *((int *)(nodo + sizeof(char) * 11 + sizeof(int))));
+    // printf("\n\nNome: %s\nIdade: %d\nTelefone: %d", nodo, *((int *)(nodo + sizeof(char) * 11)), *((int *)(nodo + sizeof(char) * 11 + sizeof(int))));
 
-    printf("\nPrimeiro Nodo: %d\n", *((int *)lista));
-    if (*((int *)lista) == 0)
-    {
-        printf("entrou aqui\n");
-        *primeiro = nodo;
-        *ultimo = nodo;
-        lista = nodo;
-        qtdLista2 = 1;
-        anterior = NULL;
-    }
-    else
-    {
-        anterior = ultimo;
+    // printf("\nPrimeiro Nodo: %d\n", *((int *)lista));
 
-        *((int *)(ultimo + sizeof(char) * 11 + sizeof(int) * 3)) = nodo;
-        *ultimo = nodo;
-        qtdLista2 += 1;
+    char **comparar = inicio;
+
+    while ((*comparar) &&
+           strcmp(*((char **)comparar), nome) < 1)
+    {
+        comparar = &(*(comparar + sizeof(char) * 11 + sizeof(int) * 3));
     }
-    proximo = NULL;
-    printf("\nqtdLista: %d\nLista: %d\n", qtdLista, *((int *)(lista + sizeof(int) * 2)));
+
+    proximo = *comparar;
+    *comparar = nodo;
 }
 
 void resetLista()
@@ -137,21 +128,15 @@ void resetLista()
 
 void excluirPessoa()
 {
-
-    printf("\nFuncao de exluir");
 }
-void listarPessoas()
+void listarPessoas(char **inicio)
 {
-    int *qtdLista;
-    void **atual;
-    qtdLista = (lista + sizeof(int) * 2);
-    atual = lista;
+    char **atual = inicio;
 
-    for (int i = 0; i < qtdLista2; i++)
+    while (*atual)
     {
-        printf("\n\nNome: %s\nIdade: %d\nTelefone: %d", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
-
-        atual = (*atual + sizeof(char) * 11 + sizeof(int) * 3);
+        printf("\n\nNome: %s\nIdade: %d\nTelefone: %d\n", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
+        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
     }
 }
 void buscarPessoa()
