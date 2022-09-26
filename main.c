@@ -14,14 +14,12 @@ Somente essa base de dados pode ficar fora do buffer principal, ou seja, pode us
 
 // tamanho da pessoa + pnext: sizeof(char)*10 + sizeof(int)*4
 
-void incluirPessoa(char *primeiro, char *ultimo);
-void listarPessoas(char **primeiro);
-char *adicionarFinal(char *inicio, char *nodo);
-void excluirPessoa();
-void buscarPessoa();
+void incluirPessoa(char **primeiro, char **ultimo);
+void listarPessoas(char **inicio);
+void excluirPessoa(char **inicio);
+void buscarPessoa(char **inicio);
 void resetLista();
 void realocarMemoria();
-void finalizar(void *pBuffer);
 
 // pBuffer = ['int = 1 ou 0 define se programa para ou continua', 'int = quantidade de pessoas adicionadas ' ]
 void *lista;
@@ -34,9 +32,6 @@ int main()
 
     void *pBuffer;
     int *opcao;
-    lista = (int *)malloc(3 * sizeof(int));
-
-    // resetLista();
 
     pBuffer = (int *)malloc(sizeof(int) * 2);
     opcao = pBuffer;
@@ -51,17 +46,18 @@ int main()
         switch (*((int *)pBuffer))
         {
         case 1:
-            incluirPessoa(primeiro, ultimo);
+            incluirPessoa(&primeiro, &ultimo);
             break;
         case 2:
-            excluirPessoa();
+
+            excluirPessoa(&primeiro);
             break;
         case 3:
             // printf("Lista fora da função: %p\n", lista);
             listarPessoas(&primeiro);
             break;
         case 4:
-            buscarPessoa();
+            buscarPessoa(&primeiro);
             break;
         case 0:
             break;
@@ -74,24 +70,20 @@ int main()
 
     // printf("Valor pBuffer = %d\n", *((int *)pBuffer));
 
-    finalizar(pBuffer);
+    free(pBuffer);
+    char **atual = &primeiro;
 
+    while (*((char **)atual))
+    {
+        char *antigo = *atual;
+        *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        free(antigo);
+    }
     return 0;
 }
 
-char *adicionarFinal(char *inicio, char *nodo)
-{
-    printf("cheogu aqui\n");
-    char *p2;
-    if (inicio == NULL)
-        return nodo;
-    for (p2 = inicio; *((char **)(p2 + sizeof(char) * 11 + sizeof(int) * 3)) != NULL; p2 = *((char **)(p2 + sizeof(char) * 11 + sizeof(int) * 3)))
-        ;
-    *((char **)(p2 + sizeof(char) * 11 + sizeof(int) * 3)) = nodo;
-    return inicio;
-}
-
-void incluirPessoa(char *inicio, char *fim)
+void incluirPessoa(char **inicio, char **fim)
 {
     void *nodo = (void *)malloc(sizeof(int) * 4 + sizeof(char) * 11);
     char *nome = (char *)malloc(sizeof(char) * 11);
@@ -110,46 +102,24 @@ void incluirPessoa(char *inicio, char *fim)
     scanf("%d", idade);
     printf("Digite o telefone: ");
     scanf("%d", telefone);
+    // printf("\n\nNome: %s\nIdade: %d\nTelefone: %d", nodo, *((int *)(nodo + sizeof(char) * 11)), *((int *)(nodo + sizeof(char) * 11 + sizeof(int))));
 
-    int found = 0;
-    char *p1, *p2;
-    if (inicio == NULL)
-    {
-        printf("initial list was NULL\n");
-        proximo = inicio;
-        inicio = nodo;
-    }
-    p2 = p1 = inicio;
-    printf("Pasou pra ca\n");
-    while (found == 0)
-    {
-        printf("Found: %d\n", (strcmp((char *)p1, (char *)nodo) >= 1));
-        if (found = (strcmp((char *)p1, (char *)nodo) >= 1) == 1)
-        {
-            printf("Pasou pra ca2\n");
-            if (p1 == inicio)
-            {
-                printf("adding at head\n");
-                proximo = inicio;
-                inicio = nodo;
-            }
-            else
-            {
-                printf("General case entered\n");
-                *((char **)(p2 + sizeof(char) * 11 + sizeof(int) * 3)) = (char *)nodo;
-                proximo = p1;
-            }
-        }
-        printf("cheogu aqui2 %s\n", *((char **)(p1 + sizeof(char) * 11 + sizeof(int) * 3)));
-        if (*((char **)(p1 + sizeof(char) * 11 + sizeof(int) * 3)) == NULL)
-        {
-            printf("cheogu aqui3\n");
-            inicio = adicionarFinal(inicio, nodo);
-        }
+    // printf("\nPrimeiro Nodo: %d\n", *((int *)lista));
 
-        p2 = p1;
-        p1 = *((char **)(p1 + sizeof(char) * 11 + sizeof(int) * 3));
+    char **comparar = inicio; // coloca "comparar" no inicio da lista
+
+    while ((*comparar) &&
+           (strcmp(*((char **)comparar), nome) < 1))
+    {
+        // anda pela lista até achar o lugar certo
+        comparar = &(*(comparar + sizeof(char) * 11 + sizeof(int) * 3));
     }
+
+    // adiciona o next do nodo atual como o next da nova pessoa adicionada
+    proximo = *(comparar + sizeof(char) * 11 + sizeof(int) * 3);
+    // adiciona a nova pessoa como o next no nodo atual da lista
+    *comparar = nodo;
+    // free(nome);
 }
 
 void resetLista()
@@ -165,8 +135,29 @@ void resetLista()
     printf("\nLista resetada, proximo: %d\nAnterior: %d\nqtdLista: %d\n", *((int *)lista), *((int *)(lista + sizeof(int))), *((int *)(lista + sizeof(int) * 2)));
 }
 
-void excluirPessoa()
+void excluirPessoa(char **inicio)
 {
+    int *comparar = 0;
+    char *antigo;
+    char **atual = inicio;
+    char *nome;
+
+    printf("Digite o nome da pessoa que deseja deletar: ");
+    scanf("%s", nome);
+    comparar = (int *)(strcmp(nome, *((char **)atual)) == 0);
+    while (*((char **)atual) && comparar == (int *)0)
+    {
+        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        comparar = (int *)(strcmp(nome, *((char **)atual)) == 0);
+    }
+
+    if (comparar == (int *)1)
+    {
+        antigo = *atual;
+        *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        // free(*((char *)antigo));
+        // free(antigo);
+    }
 }
 
 void listarPessoas(char **inicio)
@@ -179,13 +170,28 @@ void listarPessoas(char **inicio)
         atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
     }
 }
-void buscarPessoa()
-{
-    printf("\nFuncao de buscar");
-}
 
-void finalizar(void *pBuffer)
+void buscarPessoa(char **inicio)
 {
-    free(pBuffer);
-    free(lista);
+    int *comparar = 0;
+    char **atual = inicio;
+    char *nome = (char *)malloc(sizeof(char) * 11);
+
+    printf("Digite o nome da pessoa que deseja buscar: ");
+    scanf("%s", nome);
+    while (*((char **)atual) && (strcmp(nome, *((char **)atual)) != 0))
+    {
+        printf("comparar 2: %d\n", (strcmp(nome, *((char **)atual)) == 0));
+        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
+    }
+
+    if (strcmp(nome, *((char **)atual)) == 0)
+    {
+        printf("\nEncontrou a pessoa. Dados:\nNome: %s\nIdade:%d\nTelefone:%d\n\n", *((char **)(atual)), *((char **)(atual + sizeof(char) * 11)), *((char **)(atual + sizeof(char) * 11 + sizeof(int))));
+    }
+    else
+    {
+        printf("\nPessoa não encontrada na lista.\n");
+    }
+    free(nome);
 }
