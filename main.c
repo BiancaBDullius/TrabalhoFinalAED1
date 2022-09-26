@@ -109,17 +109,14 @@ void incluirPessoa(char **inicio, char **fim)
     char **comparar = inicio; // coloca "comparar" no inicio da lista
 
     while ((*comparar) &&
-           (strcmp(*((char **)comparar), nome) < 1))
+           (strcmp((*comparar), nome) < 1))
     {
         // anda pela lista até achar o lugar certo
-        comparar = &(*(comparar + sizeof(char) * 11 + sizeof(int) * 3));
+        comparar = (char **)(*comparar + sizeof(char) * 11 + sizeof(int) * 3);
     }
 
-    // adiciona o next do nodo atual como o next da nova pessoa adicionada
-    proximo = *(comparar + sizeof(char) * 11 + sizeof(int) * 3);
-    // adiciona a nova pessoa como o next no nodo atual da lista
-    *comparar = nodo;
-    // free(nome);
+    *((char **)(nodo + sizeof(char) * 11 + sizeof(int) * 3)) = *(comparar);
+    *(comparar) = nodo;
 }
 
 void resetLista()
@@ -147,7 +144,7 @@ void excluirPessoa(char **inicio)
     comparar = (int *)(strcmp(nome, *((char **)atual)) == 0);
     while (*((char **)atual) && comparar == (int *)0)
     {
-        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
         comparar = (int *)(strcmp(nome, *((char **)atual)) == 0);
     }
 
@@ -167,7 +164,7 @@ void listarPessoas(char **inicio)
     while (*atual)
     {
         printf("\n\nNome: %s\nIdade: %d\nTelefone: %d\n", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
-        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
     }
 }
 
@@ -179,15 +176,15 @@ void buscarPessoa(char **inicio)
 
     printf("Digite o nome da pessoa que deseja buscar: ");
     scanf("%s", nome);
-    while (*((char **)atual) && (strcmp(nome, *((char **)atual)) != 0))
+    while (*(atual) && (strcmp(nome, *(atual)) != 0))
     {
-        printf("comparar 2: %d\n", (strcmp(nome, *((char **)atual)) == 0));
-        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        printf("comparar 2: %d\n", (strcmp(nome, *(atual)) == 0));
+        atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
     }
 
-    if (strcmp(nome, *((char **)atual)) == 0)
+    if (strcmp(nome, *(atual)) == 0)
     {
-        printf("\nEncontrou a pessoa. Dados:\nNome: %s\nIdade:%d\nTelefone:%d\n\n", *((char **)(atual)), *((char **)(atual + sizeof(char) * 11)), *((char **)(atual + sizeof(char) * 11 + sizeof(int))));
+        printf("\nEncontrou a pessoa. Dados:\nNome: %s\nIdade:%d\nTelefone:%d\n\n", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
     }
     else
     {
