@@ -72,14 +72,14 @@ int main()
 
     free(pBuffer);
     char **atual = &primeiro;
-
-    while (*((char **)atual))
+    char *antigo;
+    while ((*atual))
     {
-        char *antigo = *atual;
+        antigo = *atual;
         *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
-        atual = &(*(atual + sizeof(char) * 11 + sizeof(int) * 3));
         free(antigo);
     }
+    free(antigo);
     return 0;
 }
 
@@ -137,23 +137,28 @@ void excluirPessoa(char **inicio)
     int *comparar = 0;
     char *antigo;
     char **atual = inicio;
-    char *nome;
+    char *nome = malloc(sizeof(char) * 11);
 
     printf("Digite o nome da pessoa que deseja deletar: ");
     scanf("%s", nome);
-    comparar = (int *)(strcmp(nome, *((char **)atual)) == 0);
-    while (*((char **)atual) && comparar == (int *)0)
+
+    while ((*atual) && ((comparar = (int *)(strcmp(nome, *atual) == 0)) != (int *)1))
     {
         atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
-        comparar = (int *)(strcmp(nome, *((char **)atual)) == 0);
     }
 
-    if (comparar == (int *)1)
+    if (comparar)
     {
         antigo = *atual;
-        *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
-        // free(*((char *)antigo));
-        // free(antigo);
+        if (*((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3)) != NULL)
+        {
+            *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
+        }
+        free(antigo);
+    }
+    else
+    {
+        printf("Pessoa não encontrada na lista.");
     }
 }
 
