@@ -7,6 +7,7 @@ void listarPessoas(char **inicio);
 void excluirPessoa(char **fim);
 void buscarPessoa(char **inicio);
 void limparMemoria(char **inicio, void *pBuffer);
+void imprimirUltimo();
 
 // pBuffer = ['int = 1 ou 0 define se programa para ou continua', 'int = quantidade de pessoas adicionadas ' ]
 char *primeiro = NULL;
@@ -33,11 +34,12 @@ int main()
             incluirPessoa(&primeiro, &ultimo);
             break;
         case 2:
-
             excluirPessoa(&ultimo);
             break;
         case 3:
             listarPessoas(&primeiro);
+            printf("\n\nUltimo\n\n");
+            imprimirUltimo();
             break;
         case 4:
             buscarPessoa(&primeiro);
@@ -74,6 +76,7 @@ void incluirPessoa(char **inicio, char **fim)
     scanf("%d", telefone);
 
     char **comparar = inicio;
+    char **ultimo = fim;
 
     while ((*comparar) &&
            (strcmp((*comparar), nome) < 1))
@@ -82,6 +85,14 @@ void incluirPessoa(char **inicio, char **fim)
     }
 
     *((char **)(nodo + sizeof(char) * 11 + sizeof(int) * 3)) = *(comparar);
+    if (*comparar != NULL)
+        *((char **)(nodo + sizeof(char) * 11 + sizeof(int) * 2)) = *((char **)(comparar + sizeof(char) * 11 + sizeof(int) * 2));
+    else
+    {
+        *((char **)(nodo + sizeof(char) * 11 + sizeof(int) * 2)) = *ultimo;
+        *ultimo = nodo;
+    }
+
     *(comparar) = nodo;
 }
 
@@ -89,10 +100,15 @@ void excluirPessoa(char **fim)
 {
     char *excluir, *proximo;
     char **atual = fim;
+    char **anterior = fim;
 
     excluir = *atual;
 
-    proximo = *(char **)(excluir + sizeof(char) * 11 + sizeof(int) * 3);
+    *anterior = *(char **)(*anterior + sizeof(char) * 11 + sizeof(int) * 2);
+
+    *((char **)(*anterior + sizeof(char) * 11 + sizeof(int) * 3)) = NULL;
+
+    proximo = *(char **)(excluir + sizeof(char) * 11 + sizeof(int) * 2);
     free(excluir);
     excluir = proximo;
     printf("\nRemovido do fim da lista.\n");
@@ -150,4 +166,11 @@ void limparMemoria(char **inicio, void *pBuffer)
         excluir = proximo;
     }
     free(pBuffer);
+}
+
+void imprimirUltimo()
+{
+    char **atual = &ultimo;
+    printf("\n\nNome: %s\nIdade: %d\nTelefone: %d\n", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
+    // printf("\n\nNome: %s\nIdade: %d\nTelefone: %d\n", *((char **)ultimo), *((int **)(*ultimo + sizeof(char) * 11)), *((int **)(*ultimo + sizeof(char) * 11 + sizeof(int))));
 }
