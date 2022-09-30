@@ -62,14 +62,15 @@ void incluirPessoa(char **inicio, char **fim)
     int *idade, *telefone;
     char *anterior, *proximo;
 
-    nome = nodo;
+    printf("Digite o nome: ");
+    scanf("%s", nome);
+
+    strcpy(nodo, nome);
     idade = (nodo + sizeof(char) * 11);
     telefone = (nodo + sizeof(char) * 11 + sizeof(int));
     anterior = (nodo + sizeof(char) * 11 + sizeof(int) * 2);
     proximo = (nodo + sizeof(char) * 11 + sizeof(int) * 3);
 
-    printf("Digite o nome: ");
-    scanf("%s", nome);
     printf("Digite a idade: ");
     scanf("%d", idade);
     printf("Digite o telefone: ");
@@ -94,6 +95,7 @@ void incluirPessoa(char **inicio, char **fim)
     }
 
     *(comparar) = nodo;
+    free(nome);
 }
 
 void excluirPessoa(char **fim)
@@ -147,7 +149,7 @@ void buscarPessoa(char **inicio)
     }
     else
     {
-        printf("\nPessoa não encontrada na lista.\n");
+        printf("\nPessoa nao encontrada na lista.\n");
     }
     free(nome);
 }
