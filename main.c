@@ -4,8 +4,9 @@
 
 void incluirPessoa(char **primeiro, char **ultimo);
 void listarPessoas(char **inicio);
-void excluirPessoa(char **inicio);
+void excluirPessoa(char **fim);
 void buscarPessoa(char **inicio);
+void limparMemoria(char **inicio, void *pBuffer);
 
 // pBuffer = ['int = 1 ou 0 define se programa para ou continua', 'int = quantidade de pessoas adicionadas ' ]
 char *primeiro = NULL;
@@ -33,7 +34,7 @@ int main()
             break;
         case 2:
 
-            excluirPessoa(&primeiro);
+            excluirPessoa(&ultimo);
             break;
         case 3:
             listarPessoas(&primeiro);
@@ -48,16 +49,7 @@ int main()
         }
     }
 
-    free(pBuffer);
-    char **atual = &primeiro;
-    char *antigo;
-    while ((*atual))
-    {
-        antigo = *atual;
-        *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
-        free(antigo);
-    }
-    free(antigo);
+    limparMemoria(&primeiro, pBuffer);
     return 0;
 }
 
@@ -93,32 +85,17 @@ void incluirPessoa(char **inicio, char **fim)
     *(comparar) = nodo;
 }
 
-void excluirPessoa(char **inicio)
+void excluirPessoa(char **fim)
 {
-    int *comparar = 0;
-    char *antigo;
-    char **atual = inicio;
-    char *nome = malloc(sizeof(char) * 11);
+    char *excluir, *proximo;
+    char **atual = fim;
 
-    printf("Digite o nome da pessoa que deseja deletar: ");
-    scanf("%s", nome);
+    excluir = *atual;
 
-    while ((*atual) && ((comparar = (int *)(strcmp(nome, *atual) == 0)) != (int *)1))
-    {
-        atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
-    }
-
-    if (comparar == (int *)1)
-    {
-        antigo = *atual;
-        *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
-        free(antigo);
-        printf("Pessoa excluida da lista.")
-    }
-    else
-    {
-        printf("Pessoa não encontrada na lista.");
-    }
+    proximo = *(char **)(excluir + sizeof(char) * 11 + sizeof(int) * 3);
+    free(excluir);
+    excluir = proximo;
+    printf("\nRemovido do fim da lista.\n");
 }
 
 void listarPessoas(char **inicio)
@@ -157,4 +134,20 @@ void buscarPessoa(char **inicio)
         printf("\nPessoa não encontrada na lista.\n");
     }
     free(nome);
+}
+
+void limparMemoria(char **inicio, void *pBuffer)
+{
+
+    char *excluir, *proximo;
+    char **atual = inicio;
+    excluir = *atual;
+
+    while (excluir != NULL)
+    {
+        proximo = *(char **)(excluir + sizeof(char) * 11 + sizeof(int) * 3);
+        free(excluir);
+        excluir = proximo;
+    }
+    free(pBuffer);
 }
