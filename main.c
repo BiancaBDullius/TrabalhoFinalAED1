@@ -4,7 +4,7 @@
 
 void incluirPessoa(char **primeiro, char **ultimo);
 void listarPessoas(char **inicio);
-void excluirPessoa(char **fim);
+void excluirPessoa(char **inicio);
 void buscarPessoa(char **inicio);
 void limparMemoria(char **inicio, void *pBuffer);
 void imprimirUltimo();
@@ -34,12 +34,10 @@ int main()
             incluirPessoa(&primeiro, &ultimo);
             break;
         case 2:
-            excluirPessoa(&ultimo);
+            excluirPessoa(&primeiro);
             break;
         case 3:
             listarPessoas(&primeiro);
-            printf("\n\nUltimo\n\n");
-            imprimirUltimo();
             break;
         case 4:
             buscarPessoa(&primeiro);
@@ -98,22 +96,22 @@ void incluirPessoa(char **inicio, char **fim)
     free(nome);
 }
 
-void excluirPessoa(char **fim)
+void excluirPessoa(char **inicio)
 {
     char *excluir, *proximo;
-    char **atual = fim;
-    char **anterior = fim;
+    char **atual = inicio;
+    char **anterior = inicio;
 
     excluir = *atual;
 
-    *anterior = *(char **)(*anterior + sizeof(char) * 11 + sizeof(int) * 2);
+    *anterior = *(char **)(*anterior + sizeof(char) * 11 + sizeof(int) * 3);
 
     *((char **)(*anterior + sizeof(char) * 11 + sizeof(int) * 3)) = NULL;
 
-    proximo = *(char **)(excluir + sizeof(char) * 11 + sizeof(int) * 2);
+    proximo = *(char **)(excluir + sizeof(char) * 11 + sizeof(int) * 3);
     free(excluir);
     excluir = proximo;
-    printf("\nRemovido do fim da lista.\n");
+    printf("\nRemovido do inicio da lista.\n");
 }
 
 void listarPessoas(char **inicio)
