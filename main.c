@@ -108,14 +108,12 @@ void excluirPessoa(char **inicio)
         atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
     }
 
-    if (comparar)
+    if (comparar == (int *)1)
     {
         antigo = *atual;
-        if (*((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3)) != NULL)
-        {
-            *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
-        }
+        *atual = *((char **)(atual + sizeof(char) * 11 + sizeof(int) * 3));
         free(antigo);
+        printf("Pessoa excluida da lista.")
     }
     else
     {
@@ -147,9 +145,12 @@ void buscarPessoa(char **inicio)
         atual = (char **)(*atual + sizeof(char) * 11 + sizeof(int) * 3);
     }
 
-    if (strcmp(nome, *(atual)) == 0)
+    if (*(atual))
     {
-        printf("\nEncontrou a pessoa. Dados:\nNome: %s\nIdade:%d\nTelefone:%d\n\n", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
+        if (strcmp(nome, *(atual)) == 0)
+        {
+            printf("\nEncontrou a pessoa. Dados:\nNome: %s\nIdade:%d\nTelefone:%d\n\n", *((char **)atual), *((int **)(*atual + sizeof(char) * 11)), *((int **)(*atual + sizeof(char) * 11 + sizeof(int))));
+        }
     }
     else
     {
